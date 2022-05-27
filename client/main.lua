@@ -1,8 +1,16 @@
 local isPaused, isDead, pickups = false, false, {}
 
-RegisterNetEvent('myMultichar:loaded')
-AddEventHandler('myMultichar:loaded', function()
-    TriggerServerEvent('esx:onPlayerJoined')
+Citizen.CreateThread(function ()
+	while true do
+		Citizen.Wait(0)
+		
+		if NetWorkIsPlayerActive(PlayerId()) then
+			TriggerServerEvent('esx:onPlayerJoined')
+
+			break
+		end
+	end
+
 end)
 
 RegisterNetEvent('esx:playerLoaded')
@@ -11,7 +19,7 @@ AddEventHandler('esx:playerLoaded', function(playerData)
 	ESX.PlayerData = playerData
 
 	-- check if player is coming from loading screen
-	--[[if GetEntityModel(PlayerPedId()) == GetHashKey('PLAYER_ZERO') then
+	if GetEntityModel(PlayerPedId()) == GetHashKey('PLAYER_ZERO') then
 		local defaultModel = GetHashKey('a_m_y_stbla_02')
 		RequestModel(defaultModel)
 
@@ -23,7 +31,7 @@ AddEventHandler('esx:playerLoaded', function(playerData)
 		SetPedDefaultComponentVariation(PlayerPedId())
 		SetPedRandomComponentVariation(PlayerPedId(), true)
 		SetModelAsNoLongerNeeded(defaultModel)
-	end--]]
+	end
 
 	-- freeze the player
 	FreezeEntityPosition(PlayerPedId(), true)
@@ -54,12 +62,12 @@ AddEventHandler('esx:playerLoaded', function(playerData)
 		})
 	end
 
-	--[[ESX.Game.Teleport(PlayerPedId(), {
+	ESX.Game.Teleport(PlayerPedId(), {
 		x = playerData.coords.x,
 		y = playerData.coords.y,
 		z = playerData.coords.z + 0.25,
 		heading = playerData.coords.heading
-	}, function()--]]
+	}, function()
 		TriggerServerEvent('esx:onPlayerSpawn')
 		TriggerEvent('esx:onPlayerSpawn')
 		TriggerEvent('playerSpawned') -- compatibility with old scripts, will be removed soon
@@ -71,7 +79,7 @@ AddEventHandler('esx:playerLoaded', function(playerData)
 		FreezeEntityPosition(PlayerPedId(), false)
 		DoScreenFadeIn(10000)
 		StartServerSyncLoops()
-	--end)
+	end)
 
 	TriggerEvent('esx:loadingScreenOff')
 end)
